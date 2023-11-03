@@ -1,1 +1,193 @@
+# pygame template
 
+import pygame
+import random
+
+pygame.init()
+
+WIDTH = 640
+HEIGHT = 480
+SIZE = (WIDTH, HEIGHT)
+
+screen = pygame.display.set_mode(SIZE)
+clock = pygame.time.Clock()
+
+# ---------------------------
+# Initialize global variables for animation
+# These must have your name in there
+# Center of screen
+# y: (640 - a) / 2
+# x: (480 - a) / 2
+
+# Conditional Variables
+daniel_scan = False
+daniel_blink = False
+daniel_blink_close = False
+daniel_blink_open = False
+daniel_stare = False
+daniel_stare_count = 150
+daniel_action_selection = True
+daniel_look_left = False
+daniel_look_right = False
+daniel_look_center = False
+
+# Dimensional Variables
+# Sclera
+daniel_sclera_width = 550
+daniel_sclera_height = 200
+daniel_sclera_x = (640 - daniel_sclera_width) / 2
+daniel_sclera_y = (480 - daniel_sclera_height) / 2
+# Eyelid: Back
+daniel_eyelid_back_width = daniel_sclera_width + 10
+daniel_eyelid_back_height = daniel_sclera_height + 40
+daniel_eyelid_back_x = daniel_sclera_x - 5
+daniel_eyelid_back_y = daniel_sclera_y - 20
+# Eyelid: Front
+daniel_eyelid_front_width = daniel_eyelid_back_width - 90
+daniel_eyelid_front_height = daniel_eyelid_back_height - 130
+daniel_eyelid_front_x = daniel_eyelid_back_x + 45
+daniel_eyelid_front_y = daniel_eyelid_back_y + 10
+
+# Pupil
+daniel_pupil_radius = 150
+daniel_pupil_x = (640 - daniel_pupil_radius) / 2
+daniel_pupil_y = (480 - daniel_pupil_radius) / 2
+
+# ---------------------------
+
+running = True
+while running:
+    # EVENT HANDLING
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # GAME STATE UPDATES
+    if daniel_action_selection is True:
+        daniel_blink_or_scan = random.randint(1, 100)
+        if daniel_blink_or_scan % 2 == 0:
+            daniel_stare = True
+            daniel_stare_count = 60
+            daniel_action_selection = False
+        elif daniel_blink_or_scan % 2 !=0:
+            if daniel_blink_or_scan < 60:
+                daniel_scan = True
+                daniel_look_left = True
+                daniel_action_selection = False
+            elif daniel_blink_or_scan >= 60:
+                daniel_blink = True
+                daniel_blink_close = True
+                daniel_action_selection = False
+    
+    
+
+    # DRAWING
+    x = 0
+    y = 0
+    width = 640
+    height = 480
+
+    # Rather than screen.fill, draw a rectangle
+    pygame.draw.rect(screen, (125, 0, 0), (x, y, width, height))
+    # Drawings & Animations
+    # Eyelid: Back
+    pygame.draw.ellipse(screen, (75, 0, 0), (x + daniel_eyelid_back_x, 
+                                            y + daniel_eyelid_back_y, 
+                                            daniel_eyelid_back_width, 
+                                            daniel_eyelid_back_height))
+    # Sclera
+    pygame.draw.ellipse(screen, (240, 240, 240), (x + daniel_sclera_x, 
+                                                  y + daniel_sclera_y,
+                                                  daniel_sclera_width, 
+                                                  daniel_sclera_height))
+    # Pupil
+    # Stare
+    if daniel_blink is True:
+        pygame.draw.ellipse(screen, (0, 0, 0), (x + daniel_pupil_x, 
+               y + daniel_pupil_y, 
+                daniel_pupil_radius, 
+                daniel_pupil_radius))
+    
+    elif daniel_stare is True:
+        pygame.draw.ellipse(screen, (0, 0, 0), (x + daniel_pupil_x, 
+                                               y + daniel_pupil_y, 
+                                                daniel_pupil_radius, 
+                                                daniel_pupil_radius))
+        if daniel_stare_count == 0:
+            daniel_stare = False
+            daniel_action_selection = True
+        daniel_stare_count -= 1
+    # Look Left
+    elif daniel_scan is True:
+        if daniel_look_left is True:
+            pygame.draw.ellipse(screen, (0, 0, 0), (x + daniel_pupil_x, 
+                   y + daniel_pupil_y, 
+                    daniel_pupil_radius, 
+                    daniel_pupil_radius))
+            if daniel_pupil_x == 145:
+                daniel_look_left = False
+                daniel_look_right = True
+            daniel_pupil_x -= 1
+    # Look Right
+        elif daniel_look_right is True:
+            pygame.draw.ellipse(screen, (0, 0, 0), (x + daniel_pupil_x, 
+                   y + daniel_pupil_y, 
+                    daniel_pupil_radius, 
+                    daniel_pupil_radius))
+            if daniel_pupil_x == 345:
+                daniel_look_right = False
+                daniel_look_center = True
+            daniel_pupil_x += 1
+        # Look Center
+        elif daniel_look_center is True:
+            pygame.draw.ellipse(screen, (0, 0, 0), (x + daniel_pupil_x, 
+                   y + daniel_pupil_y, 
+                    daniel_pupil_radius, 
+                    daniel_pupil_radius))
+            if daniel_pupil_x == 245:
+                daniel_look_center = False
+                daniel_scan = False
+                daniel_action_selection = True
+            daniel_pupil_x -= 1
+
+    #  Blink Not True
+    if daniel_blink is False:
+        pygame.draw.ellipse(screen, (75, 0, 0), (x + daniel_eyelid_front_x,
+                                                y+ daniel_eyelid_front_y,
+                                                daniel_eyelid_front_width,
+                                                daniel_eyelid_front_height))
+    # Blink True
+    if daniel_blink is True:
+        if daniel_blink_close is True:
+            pygame.draw.ellipse(screen, (75, 0, 0), (x + daniel_eyelid_front_x,
+                y+ daniel_eyelid_front_y,
+                daniel_eyelid_front_width,
+                daniel_eyelid_front_height))
+            daniel_eyelid_front_height += 4
+            daniel_eyelid_front_width += 3.2
+            daniel_eyelid_front_x -= 1.6
+            if daniel_eyelid_front_height >= 230:
+                daniel_blink_close = False
+                daniel_blink_open = True
+        elif daniel_blink_open is True:
+            pygame.draw.ellipse(screen, (70, 0, 0), (x + daniel_eyelid_front_x,
+                y+ daniel_eyelid_front_y,
+                daniel_eyelid_front_width,
+                daniel_eyelid_front_height))
+            daniel_eyelid_front_height -= 4
+            daniel_eyelid_front_width -= 3.2
+            daniel_eyelid_front_x += 1.6
+            if daniel_eyelid_front_height == 110:
+                daniel_blink_open = False
+                daniel_blink = False
+                daniel_action_selection = True
+        
+
+    # Must be the last two lines
+    # of the game loop
+    pygame.display.flip()
+    clock.tick(30)
+    #---------------------------
+
+
+pygame.quit()
